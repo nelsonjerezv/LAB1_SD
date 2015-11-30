@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -21,7 +20,7 @@ public class MultiThreadServer implements Runnable {
     private String fromClient;
    MultiThreadServer(Socket csocket) {
       this.csocket = csocket;
-              String fromClient;
+              //String fromClient;
 
    }
 
@@ -36,6 +35,7 @@ public class MultiThreadServer implements Runnable {
           System.out.println(Thread.activeCount());
       }
    }
+   @Override
    public void run() {
        try {     
            
