@@ -16,9 +16,7 @@ public class TCPClient {
     
     public static void main(String args[]) throws Exception{
         //Variables
-        String sentence;
         String fromServer;
-        int a =0;
         
         String[] requests = {
             "GET /respuestas/hola", // <p>hola mundo</>
@@ -57,7 +55,6 @@ public class TCPClient {
                 
                 //Cerramos el socket
                 clientSocket.close();
-                a++;
             }
         }
     
