@@ -18,18 +18,22 @@ public class TCPClient {
         //Variables
         String fromServer;
         
-        String[] requests = {
-            "GET /respuestas/hola", // <p>hola mundo</>
-            "GET /users",
-            "GET /users/1234",
-            "GET /users/55556",
-            "ABC /users/1234",
+        /*String[] requests = {
+            "GET /querytype1/hola", // <p>hola mundo</>
+            "GET /querytype1",
+            "GET /querytype1/1234",
+            "GET /querytype1/55556",
+            "ABC /querytype1/1234",
             "POST /users username=gbenussi&password=contrasena", // adasdas
-            "POST /respuestas/hola body=<p>hola mundo</>",
-            "POST /respuestas/hola body=<asdasdasdasdasd",
-            "PUT /respuestas/hola title=hola+mundo", // aasdsadasdsa
-            "PUT /users/1234 username=giovanni", // aasdsadasdsa
-            "DELETE /users/1234",};
+            "POST /querytype1/hola body=<p>hola mundo</>",
+            "POST /querytype1/hola body=<asdasdasdasdasd",
+            "PUT /querytype1/hola title=hola+mundo", // aasdsadasdsa
+            "PUT /querytype1/1234 username=giovanni", // aasdsadasdsa
+            "DELETE /querytype1/1234",};*/
+        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+        String sentence = inFromUser.readLine();
+        sentence = "GET /asd/ " + sentence;
+        String[] requests = {sentence};
         
         for (String request : requests) {
             
