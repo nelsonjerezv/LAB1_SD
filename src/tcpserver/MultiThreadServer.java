@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -19,29 +18,29 @@ import java.util.logging.Logger;
 public class MultiThreadServer implements Runnable {
    
     Socket csocket;
-   LRUCache lru_cache;   
-   private String fromClient;
+    ArrayList<LRUCache> particiones;
+    private String fromClient;
+
+    MultiThreadServer(Socket csocket, ArrayList<LRUCache> Particiones) {
+        this.csocket = csocket;  
+        this.particiones = Particiones;
+    }
    
-   MultiThreadServer(Socket csocket, LRUCache lru_cache) {
-      this.csocket = csocket;
-      this.lru_cache = lru_cache;
-   }   
-   
-   @Override
-   public void run() {
-       try {     
-           
-           BufferedReader inFromClient = new BufferedReader(new InputStreamReader(csocket.getInputStream()));
-           //Buffer para enviar al cliente
-           DataOutputStream outToClient = new DataOutputStream(csocket.getOutputStream());
-           
-           //Recibimos el dato del cliente y lo mostramos en el server
-           fromClient =inFromClient.readLine();
-           System.out.println("===== ===== ===== ===== =====");
-           
+    @Override
+    public void run() {
+        try {     
+
+            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(csocket.getInputStream()));
+            //Buffer para enviar al cliente
+            DataOutputStream outToClient = new DataOutputStream(csocket.getOutputStream());
+
+            //Recibimos el dato del cliente y lo mostramos en el server
+            fromClient =inFromClient.readLine();
+            System.out.println("===== ===== ===== ===== =====");
+
             String[] tokens = fromClient.split(" ");
             String parametros = tokens[1];
-            
+
             String http_method = tokens[0];
 
             String[] tokens_parametros = parametros.split("/");
@@ -55,18 +54,25 @@ public class MultiThreadServer implements Runnable {
             System.out.println("HTTP METHOD: " + http_method);
             System.out.println("Resource: " + resource);
             System.out.println("ID:          " + id);
-            System.out.println("META DATA:    " + meta_data);
+            System.out.println("META DATA:    " + meta_data);            
+
+            //**************************************
+            //    AGREGAR FUNCION HASH SOBRE
+            //
+                  int ParticionDestino = 0; // destino = hash(resource + id + meta_data)
+            //
+            //**************************************
+
             switch (http_method) {
                 case "GET":
-                    if (id == "") {
+                    if ("".equals(id)) {
                         System.out.println("Buscando en la base de datos los ultimos 10 registros de tipo '" + resource + "'");
                         // buscar en el cache nivel general para un resource                      
                     } else {
                         System.out.println("Buscando en el cache de '" + resource + "' el registro con id " + id);
                         // buscar en el cache
-                        //******************************************************************************************
                         String result;
-                        result = lru_cache.getEntryFromCache(id);
+                        result = particiones.get(ParticionDestino).getEntryFromCache(id);
                         if (result == null) { // MISS
                             System.out.println("MISS :(");
                             outToClient.writeBytes("MISS\n");
@@ -74,48 +80,47 @@ public class MultiThreadServer implements Runnable {
                             // agarra respuesta
                             //result = FrontService.getEntry(my_queries[i]);
                             // ,ete query + respuesta
-                            lru_cache.addEntryToCache(id, id.toUpperCase());
+                            particiones.get(ParticionDestino).addEntryToCache(id, id.toUpperCase());
                         }else{
                             System.out.println("HIT !");
+                            // enviar respuesta                            
                             outToClient.writeBytes(result+"\n");
-                            // enviar respuesta
                             //total_hits++;
                         }
-                        lru_cache.print();
-                        System.out.println("");
-                        //******************************************************************************************
+                        // Mostrar el cache
+                        particiones.get(ParticionDestino).print(); System.out.println("");
                     }
                     break;
-//                case "POST":
-//                    System.out.println("Creando un usuario con los siguientes datos: (" + meta_data + ")");
-//                    for (String params : meta_data.split("&")) {
-//                        String[] parametros_meta = params.split("=");
-//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-//                    }
-//                    break;
-//                case "PUT":
-//                    System.out.println("Actualizando el usuario con id " + id + " con los siguientes datos (" + meta_data + ")");
-//                    for (String params : meta_data.split("&")) {
-//                        String[] parametros_meta = params.split("=");
-//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-//                    }
-//                    break;
-//                case "DELETE":
-//                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
-//                    break;
+                //                case "POST":
+                //                    System.out.println("Creando un usuario con los siguientes datos: (" + meta_data + ")");
+                //                    for (String params : meta_data.split("&")) {
+                //                        String[] parametros_meta = params.split("=");
+                //                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
+                //                    }
+                //                    break;
+                //                case "PUT":
+                //                    System.out.println("Actualizando el usuario con id " + id + " con los siguientes datos (" + meta_data + ")");
+                //                    for (String params : meta_data.split("&")) {
+                //                        String[] parametros_meta = params.split("=");
+                //                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
+                //                    }
+                //                    break;
+                //                case "DELETE":
+                //                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
+                //                    break;
                 default:
                     System.out.println("Not a valid HTTP Request");
                     break;
             }
             //Se le envia al cliente
             //outToClient.writeBytes("Consulta Procesada\n");
-           
-       } catch (IOException ex) {
-           Logger.getLogger(MultiThreadServer.class.getName()).log(Level.SEVERE, null, ex);
-       }
-       
-       
-       
-       
-   }
+
+        } catch (IOException ex) {
+            Logger.getLogger(MultiThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+
+
+    }
 }
