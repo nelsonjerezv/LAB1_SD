@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-//sdfsdfsdfsdfsdf
+
 package tcpserver;
 
 import java.io.BufferedReader;
@@ -17,17 +17,19 @@ import java.util.logging.Logger;
 
 public class MultiThreadServer implements Runnable {
    Socket csocket;
+   LRUCache lru_cache = new LRUCache(5);
     private String fromClient;
    MultiThreadServer(Socket csocket) {
       this.csocket = csocket;
-              //String fromClient;
-
    }
 
-   public static void main(String args[]) 
-   throws Exception {
+   public static void main(String args[]) throws Exception {
       ServerSocket ssock = new ServerSocket(1234);
       System.out.println("Listening");
+      
+      int total_hits = 0, total_miss = 0;
+      //LRUCache lru_cache = new LRUCache(5);
+      
       while (true) {
          Socket sock = ssock.accept();
          System.out.println("Connected");
@@ -79,29 +81,47 @@ public class MultiThreadServer implements Runnable {
                 case "GET":
                     if (id == "") {
                         System.out.println("Buscando en la base de datos los ultimos 10 registros de tipo '" + resource + "'");
-                        // buscar en el cache
-                        // hit o miss
+                        // buscar en el cache nivel general para un resource                      
                     } else {
                         System.out.println("Buscando en el cache de '" + resource + "' el registro con id " + id);
+                        // buscar en el cache
+                        //******************************************************************************************
+                        String result;
+                        result = lru_cache.getEntryFromCache(id);
+                        if (result == null) { // MISS
+                            System.out.println("MISS :(");
+                            //total_miss++;
+                            // agarra respuesta
+                            //result = FrontService.getEntry(my_queries[i]);
+                            // ,ete query + respuesta
+                            lru_cache.addEntryToCache(id, "respuesta de: "+id);
+                        }else{
+                            System.out.println("HIT !");
+                            // enviar respuesta
+                            //total_hits++;
+                        }
+                        lru_cache.print();
+                        System.out.println("");
+                        //******************************************************************************************
                     }
                     break;
-                case "POST":
-                    System.out.println("Creando un usuario con los siguientes datos: (" + meta_data + ")");
-                    for (String params : meta_data.split("&")) {
-                        String[] parametros_meta = params.split("=");
-                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-                    }
-                    break;
-                case "PUT":
-                    System.out.println("Actualizando el usuario con id " + id + " con los siguientes datos (" + meta_data + ")");
-                    for (String params : meta_data.split("&")) {
-                        String[] parametros_meta = params.split("=");
-                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-                    }
-                    break;
-                case "DELETE":
-                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
-                    break;
+//                case "POST":
+//                    System.out.println("Creando un usuario con los siguientes datos: (" + meta_data + ")");
+//                    for (String params : meta_data.split("&")) {
+//                        String[] parametros_meta = params.split("=");
+//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
+//                    }
+//                    break;
+//                case "PUT":
+//                    System.out.println("Actualizando el usuario con id " + id + " con los siguientes datos (" + meta_data + ")");
+//                    for (String params : meta_data.split("&")) {
+//                        String[] parametros_meta = params.split("=");
+//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
+//                    }
+//                    break;
+//                case "DELETE":
+//                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
+//                    break;
                 default:
                     System.out.println("Not a valid HTTP Request");
                     break;

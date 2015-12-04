@@ -32,7 +32,7 @@ public class TCPClient {
             "DELETE /querytype1/1234",};*/
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();
-        sentence = "GET /asd/ " + sentence;
+        sentence = "GET /consulta/" + sentence;
         String[] requests = {sentence};
         
         for (String request : requests) {
