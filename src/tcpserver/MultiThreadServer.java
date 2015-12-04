@@ -12,31 +12,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MultiThreadServer implements Runnable {
-   Socket csocket;
-   LRUCache lru_cache = new LRUCache(5);
-    private String fromClient;
-   MultiThreadServer(Socket csocket) {
+   
+    Socket csocket;
+   LRUCache lru_cache;   
+   private String fromClient;
+   
+   MultiThreadServer(Socket csocket, LRUCache lru_cache) {
       this.csocket = csocket;
-   }
-
-   public static void main(String args[]) throws Exception {
-      ServerSocket ssock = new ServerSocket(1234);
-      System.out.println("Listening");
-      
-      int total_hits = 0, total_miss = 0;
-      //LRUCache lru_cache = new LRUCache(5);
-      
-      while (true) {
-         Socket sock = ssock.accept();
-         System.out.println("Connected");
-         new Thread(new MultiThreadServer(sock)).start();
-          System.out.println(Thread.activeCount());
-      }
-   }
+      this.lru_cache = lru_cache;
+   }   
+   
    @Override
    public void run() {
        try {     
@@ -47,22 +37,11 @@ public class MultiThreadServer implements Runnable {
            
            //Recibimos el dato del cliente y lo mostramos en el server
            fromClient =inFromClient.readLine();
-                                    // System.out.println("Received: " + fromClient);
-
-                                     //Se procesa el dato recibido
-                                     //processedData = fromClient.toUpperCase() + '\n';
-                                     //String reverse = new StringBuffer(fromClient).reverse().toString() + '\n';
-
-                                     //Se le envia al cliente
-                                     //outToClient.writeBytes(reverse);
            System.out.println("===== ===== ===== ===== =====");
-
-            //String request = requests[i];
-
-            //String[] tokens = request.split(" ");
+           
             String[] tokens = fromClient.split(" ");
             String parametros = tokens[1];
-
+            
             String http_method = tokens[0];
 
             String[] tokens_parametros = parametros.split("/");
@@ -90,13 +69,15 @@ public class MultiThreadServer implements Runnable {
                         result = lru_cache.getEntryFromCache(id);
                         if (result == null) { // MISS
                             System.out.println("MISS :(");
+                            outToClient.writeBytes("MISS\n");
                             //total_miss++;
                             // agarra respuesta
                             //result = FrontService.getEntry(my_queries[i]);
                             // ,ete query + respuesta
-                            lru_cache.addEntryToCache(id, "respuesta de: "+id);
+                            lru_cache.addEntryToCache(id, id.toUpperCase());
                         }else{
                             System.out.println("HIT !");
+                            outToClient.writeBytes(result+"\n");
                             // enviar respuesta
                             //total_hits++;
                         }
@@ -127,7 +108,7 @@ public class MultiThreadServer implements Runnable {
                     break;
             }
             //Se le envia al cliente
-            outToClient.writeBytes("Consulta Procesada\n");
+            //outToClient.writeBytes("Consulta Procesada\n");
            
        } catch (IOException ex) {
            Logger.getLogger(MultiThreadServer.class.getName()).log(Level.SEVERE, null, ex);
