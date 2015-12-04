@@ -44,7 +44,7 @@ public class CacheStart {
       while (true) {
          Socket sock = ssock.accept();
          System.out.println("Connected");
-         new Thread(new MultiThreadServer(sock, lru_cache)).start();
+         new Thread(new MultiThreadServer(sock, Particiones)).start();
       }
    }
 }

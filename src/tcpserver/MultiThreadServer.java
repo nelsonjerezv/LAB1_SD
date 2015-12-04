@@ -91,23 +91,23 @@ public class MultiThreadServer implements Runnable {
                         particiones.get(ParticionDestino).print(); System.out.println("");
                     }
                     break;
-                //                case "POST":
-                //                    System.out.println("Creando un usuario con los siguientes datos: (" + meta_data + ")");
-                //                    for (String params : meta_data.split("&")) {
-                //                        String[] parametros_meta = params.split("=");
-                //                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-                //                    }
-                //                    break;
-                //                case "PUT":
-                //                    System.out.println("Actualizando el usuario con id " + id + " con los siguientes datos (" + meta_data + ")");
-                //                    for (String params : meta_data.split("&")) {
-                //                        String[] parametros_meta = params.split("=");
-                //                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-                //                    }
-                //                    break;
-                //                case "DELETE":
-                //                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
-                //                    break;
+//                case "POST":
+//                    System.out.println("Creando un usuario con los siguientes datos: (" + meta_data + ")");
+//                    for (String params : meta_data.split("&")) {
+//                        String[] parametros_meta = params.split("=");
+//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
+//                    }
+//                    break;
+//                case "PUT":
+//                    System.out.println("Actualizando el usuario con id " + id + " con los siguientes datos (" + meta_data + ")");
+//                    for (String params : meta_data.split("&")) {
+//                        String[] parametros_meta = params.split("=");
+//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
+//                    }
+//                    break;
+//                case "DELETE":
+//                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
+//                    break;
                 default:
                     System.out.println("Not a valid HTTP Request");
                     break;
