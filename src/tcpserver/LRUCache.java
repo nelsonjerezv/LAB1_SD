@@ -20,6 +20,15 @@ public class LRUCache {
         }
         return result;
     }
+    
+    public String updateAnswerFromCache(String query, String answer) {
+        String result = cache.get(query);
+        if(result != null) {
+            cache.remove(query);
+            cache.put(query, answer);
+        }
+        return result;
+    }
 
     public LRUCache(int size) {
         this.size = size;
@@ -44,6 +53,12 @@ public class LRUCache {
     public void print() {
         System.out.println("===== My LRU Cache =====");
         System.out.println("| " + String.join(" | ", cache.keySet()) + " | ");
+        System.out.println("========================");
+    }
+
+    public void printAns() {
+        System.out.println("===== My LRU Cache Answers =====");
+        System.out.println("| " + String.join(" | ", cache.values()) + " | ");
         System.out.println("========================");
     }
 

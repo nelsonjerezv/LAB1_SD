@@ -48,7 +48,13 @@ public class MultiThreadServer implements Runnable {
             String resource = tokens_parametros.length > 1 ? tokens_parametros[1] : "";
             String id = tokens_parametros.length > 2 ? tokens_parametros[2] : "";
 
-            String meta_data = tokens.length > 2 ? tokens[2] : "";
+            //String meta_data = tokens.length > 2 ? tokens[2] : "";
+            String meta_data = "";
+            if(tokens.length > 2){
+                for (int i = 2; i < tokens.length; i++) {
+                    id = id + " " +tokens[i];
+                }
+            }
 
             System.out.println("Consulta: " + fromClient);
             System.out.println("HTTP METHOD: " + http_method);
@@ -59,7 +65,8 @@ public class MultiThreadServer implements Runnable {
             //**************************************
             //    AGREGAR FUNCION HASH SOBRE
             //
-                  int ParticionDestino = 0; // destino = hash(resource + id + meta_data)
+            int ParticionDestino = hash(id, particiones.size());
+            System.out.println("pd:"+ParticionDestino);
             //
             //**************************************
 
@@ -76,11 +83,7 @@ public class MultiThreadServer implements Runnable {
                         if (result == null) { // MISS
                             System.out.println("MISS :(");
                             outToClient.writeBytes("MISS\n");
-                            //total_miss++;
-                            // agarra respuesta
-                            //result = FrontService.getEntry(my_queries[i]);
-                            // ,ete query + respuesta
-                            particiones.get(ParticionDestino).addEntryToCache(id, id.toUpperCase());
+                            //particiones.get(ParticionDestino).addEntryToCache(id, id.toUpperCase());
                         }else{
                             System.out.println("HIT !");
                             // enviar respuesta                            
@@ -89,22 +92,32 @@ public class MultiThreadServer implements Runnable {
                         }
                         // Mostrar el cache
                         particiones.get(ParticionDestino).print(); System.out.println("");
+                    particiones.get(ParticionDestino).printAns(); System.out.println("");
                     }
                     break;
-//                case "POST":
-//                    System.out.println("Creando un usuario con los siguientes datos: (" + meta_data + ")");
-//                    for (String params : meta_data.split("&")) {
-//                        String[] parametros_meta = params.split("=");
-//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-//                    }
-//                    break;
-//                case "PUT":
-//                    System.out.println("Actualizando el usuario con id " + id + " con los siguientes datos (" + meta_data + ")");
-//                    for (String params : meta_data.split("&")) {
-//                        String[] parametros_meta = params.split("=");
-//                        System.out.println("\t* " + parametros_meta[0] + " -> " + parametros_meta[1]);
-//                    }
-//                    break;
+                case "POST":
+                    System.out.println("Mensaje desde IndexService");
+                    System.out.println("Agregamos:\n    query : " + id + "\n    answer: " + id.toUpperCase());
+                    
+                    syncPost(ParticionDestino, id);
+                    
+                    outToClient.writeBytes("Agregado.\n");
+                    // Mostrar el cache
+                    particiones.get(ParticionDestino).print(); System.out.println("");
+                    particiones.get(ParticionDestino).printAns(); System.out.println("");
+                    break;
+                case "PUT":
+                   
+                    System.out.println("Mensaje desde IndexService");
+                    System.out.println("Actualizamos:\n    query : " + id + "\n    answer: " + id.toLowerCase());
+                    
+                    syncPut(ParticionDestino, id);
+                    
+                    outToClient.writeBytes("Actualizado.\n");
+                    // Mostrar el cache
+                    particiones.get(ParticionDestino).print(); System.out.println("");
+                    particiones.get(ParticionDestino).printAns(); System.out.println("");
+                    break;
 //                case "DELETE":
 //                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
 //                    break;
@@ -123,4 +136,26 @@ public class MultiThreadServer implements Runnable {
 
 
     }
+
+    private int hash(String id, int size) {
+        int hash = 13;
+        for (int i = 0; i < id.length(); i++) {
+            hash = hash*31 + id.charAt(i);
+        }
+        hash = hash*hash;
+        hash = (int) Math.sqrt(hash);
+        hash = hash%size;
+        
+        return hash;
+    }
+
+    private synchronized void syncPost(int ParticionDestino, String id) {
+        particiones.get(ParticionDestino).addEntryToCache(id, id.toUpperCase());
+    }
+    
+    private synchronized void syncPut(int ParticionDestino, String id) {
+        particiones.get(ParticionDestino).updateAnswerFromCache(id, id.toLowerCase());
+    }
+    
+    
 }
