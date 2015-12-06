@@ -115,9 +115,17 @@ public class MultiThreadServer implements Runnable {
                     particiones.get(ParticionDestino).print(); System.out.println("");
                     particiones.get(ParticionDestino).printAns(); System.out.println("");
                     break;
-//                case "DELETE":
-//                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
-//                    break;
+                case "DELETE":
+                    System.out.println("Mensaje desde IndexService");
+                    System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
+                    
+                    syncDelete(ParticionDestino, id);
+                    
+                    outToClient.writeBytes("Eliminado.\n");
+                    // Mostramos el cache(querys y answers)
+                    particiones.get(ParticionDestino).print(); System.out.println("");
+                    particiones.get(ParticionDestino).printAns(); System.out.println("");
+                    break;
                 default:
                     System.out.println("Not a valid HTTP Request");
                     break;
@@ -146,6 +154,10 @@ public class MultiThreadServer implements Runnable {
     
     private synchronized void syncPut(int ParticionDestino, String id) {
         particiones.get(ParticionDestino).updateAnswerFromCache(id, id.toLowerCase());
+    }
+
+    private void syncDelete(int ParticionDestino, String id) {
+        particiones.get(ParticionDestino).removeEntryFromCache(id);
     }
     
     

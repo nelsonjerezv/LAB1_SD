@@ -26,6 +26,14 @@ public class LRUCache {
         return result;
     }
     
+    // Eliminamos una query
+    public void removeEntryFromCache(String query) {
+        String result = cache.get(query);
+        if(result != null) {
+            cache.remove(query);
+        }
+    }
+    
     // Actualizamos la respuesta a una query
     public String updateAnswerFromCache(String query, String answer) {
         String result = cache.get(query);
