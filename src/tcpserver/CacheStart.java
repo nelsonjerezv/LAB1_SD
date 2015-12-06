@@ -45,10 +45,12 @@ public class CacheStart {
             Particiones.add(lru_cache);
             }
         }
-
-        LRUCache lru_cache = new LRUCache(tamano);
+        
         System.out.println("Listening");
-
+        
+        // Creamos una hebra cada vez que un cliente se conecta, 
+        // a ese cliente se le entrega el socket y la lista de 
+        // particiones para que pueda saber a cual acceder
         while (true) {
            Socket sock = ssock.accept();
            System.out.println("Connected");

@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 public class MultiThreadServer implements Runnable {
    
     Socket csocket;
+    // Arreglo con las particiones del cache
     ArrayList<LRUCache> particiones;
     private String fromClient;
 
@@ -29,7 +30,7 @@ public class MultiThreadServer implements Runnable {
     @Override
     public void run() {
         try {     
-
+            //Buffer para leer al cliente
             BufferedReader inFromClient = new BufferedReader(new InputStreamReader(csocket.getInputStream()));
             //Buffer para enviar al cliente
             DataOutputStream outToClient = new DataOutputStream(csocket.getOutputStream());
@@ -60,15 +61,11 @@ public class MultiThreadServer implements Runnable {
             System.out.println("HTTP METHOD: " + http_method);
             System.out.println("Resource: " + resource);
             System.out.println("ID:          " + id);
-            System.out.println("META DATA:    " + meta_data);            
-
-            //**************************************
-            //    AGREGAR FUNCION HASH SOBRE
-            //
+            System.out.println("META DATA:    " + meta_data);  
+            
+            // Determinamos la particion a acceder con una funcion hash
             int ParticionDestino = hash(id, particiones.size());
             System.out.println("pd:"+ParticionDestino);
-            //
-            //**************************************
 
             switch (http_method) {
                 case "GET":
@@ -77,44 +74,44 @@ public class MultiThreadServer implements Runnable {
                         // buscar en el cache nivel general para un resource                      
                     } else {
                         System.out.println("Buscando en el cache de '" + resource + "' el registro con id " + id);
-                        // buscar en el cache
-                        String result;
-                        result = particiones.get(ParticionDestino).getEntryFromCache(id);
+                        // buscar en el cache la respuesta a la query
+                        String result = particiones.get(ParticionDestino).getEntryFromCache(id);
                         if (result == null) { // MISS
                             System.out.println("MISS :(");
+                            //Enviamos miss al cliente
                             outToClient.writeBytes("MISS\n");
                             //particiones.get(ParticionDestino).addEntryToCache(id, id.toUpperCase());
                         }else{
                             System.out.println("HIT !");
-                            // enviar respuesta                            
+                            // Enviamos hit al cliente
                             outToClient.writeBytes(result+"\n");
-                            //total_hits++;
                         }
-                        // Mostrar el cache
+                        // Mostramos el cache(querys y answers)
                         particiones.get(ParticionDestino).print(); System.out.println("");
-                    particiones.get(ParticionDestino).printAns(); System.out.println("");
+                        particiones.get(ParticionDestino).printAns(); System.out.println("");
                     }
                     break;
                 case "POST":
                     System.out.println("Mensaje desde IndexService");
                     System.out.println("Agregamos:\n    query : " + id + "\n    answer: " + id.toUpperCase());
                     
+                    // Metodo sincrono para agregar la query con su respuesta al cache
                     syncPost(ParticionDestino, id);
                     
                     outToClient.writeBytes("Agregado.\n");
-                    // Mostrar el cache
+                    // Mostramos el cache(querys y answers)
                     particiones.get(ParticionDestino).print(); System.out.println("");
                     particiones.get(ParticionDestino).printAns(); System.out.println("");
                     break;
-                case "PUT":
-                   
+                case "PUT":                  
                     System.out.println("Mensaje desde IndexService");
                     System.out.println("Actualizamos:\n    query : " + id + "\n    answer: " + id.toLowerCase());
                     
+                    // Metodo sincrono para actualizar la respuesta de la query
                     syncPut(ParticionDestino, id);
                     
                     outToClient.writeBytes("Actualizado.\n");
-                    // Mostrar el cache
+                    // Mostramos el cache(querys y answers)
                     particiones.get(ParticionDestino).print(); System.out.println("");
                     particiones.get(ParticionDestino).printAns(); System.out.println("");
                     break;
@@ -125,16 +122,9 @@ public class MultiThreadServer implements Runnable {
                     System.out.println("Not a valid HTTP Request");
                     break;
             }
-            //Se le envia al cliente
-            //outToClient.writeBytes("Consulta Procesada\n");
-
         } catch (IOException ex) {
             Logger.getLogger(MultiThreadServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
-
-
     }
 
     private int hash(String id, int size) {
@@ -142,8 +132,9 @@ public class MultiThreadServer implements Runnable {
         for (int i = 0; i < id.length(); i++) {
             hash = hash*31 + id.charAt(i);
         }
-        hash = hash*hash;
-        hash = (int) Math.sqrt(hash);
+        // Nos aseguramos de que sea positivo
+        hash = (int) Math.sqrt(hash*hash);
+        // Determinamos la particion a ocupar
         hash = hash%size;
         
         return hash;

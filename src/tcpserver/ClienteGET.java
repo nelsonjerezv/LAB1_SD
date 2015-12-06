@@ -12,7 +12,7 @@ import java.net.*;
  *
  * @author luis
  */
-public class TCPClient {
+public class ClienteGET {
     
     public static void main(String args[]) throws Exception{
         //Variables
@@ -30,36 +30,34 @@ public class TCPClient {
             "PUT /querytype1/hola title=hola+mundo", // aasdsadasdsa
             "PUT /querytype1/1234 username=giovanni", // aasdsadasdsa
             "DELETE /querytype1/1234",};*/
+        
+        //Buffer para recibir desde consola
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();
-        sentence = "PUT /consulta/" + sentence;
+        
+        // estructura improvisada
+        sentence = "GET /consulta/" + sentence;
         String[] requests = {sentence};
         
         for (String request : requests) {
-            
-                //Buffer para recibir desde el usuario
-                //BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-                
-                //Socket para el cliente (host, puerto)
-                Socket clientSocket = new Socket("localhost", 1234);
-                
-                //Buffer para enviar el dato al server
-                DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-                
-                //Buffer para recibir dato del servidor
-                BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                
-                //Leemos del cliente y lo mandamos al servidor
-                //sentence = inFromUser.readLine();
-                outToServer.writeBytes(request + '\n');
-                
-                //Recibimos del servidor
-                fromServer = inFromServer.readLine();
-                System.out.println("Server response: " + fromServer);
-                
-                //Cerramos el socket
-                clientSocket.close();
-            }
+            //Socket para el cliente (host, puerto)
+            Socket clientSocket = new Socket("localhost", 1234);
+
+            //Buffer para enviar el dato al server
+            DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+
+            //Buffer para recibir dato del servidor
+            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+            //Leemos del cliente y lo mandamos al servidor
+            outToServer.writeBytes(request + '\n');
+
+            //Recibimos del servidor
+            fromServer = inFromServer.readLine();
+            System.out.println("Server response: " + fromServer);
+
+            //Cerramos el socket
+            clientSocket.close();
         }
-    
+    }    
 }
