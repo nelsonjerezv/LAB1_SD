@@ -1,6 +1,5 @@
 package tcpserver;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 /**
@@ -11,7 +10,13 @@ public class LRUCache {
 
     int size;
     LinkedHashMap<String, String> cache;
-
+    
+    public LRUCache(int size) {
+        this.size = size;
+        this.cache = new LinkedHashMap<>();
+    }
+    
+    // Devolvemos la respuesta a una query
     public String getEntryFromCache(String query) {
         String result = cache.get(query);
         if(result != null) {
@@ -21,6 +26,7 @@ public class LRUCache {
         return result;
     }
     
+    // Actualizamos la respuesta a una query
     public String updateAnswerFromCache(String query, String answer) {
         String result = cache.get(query);
         if(result != null) {
@@ -30,11 +36,7 @@ public class LRUCache {
         return result;
     }
 
-    public LRUCache(int size) {
-        this.size = size;
-        this.cache = new LinkedHashMap<>();
-    }
-
+    // Agregamos una query al cache, o bien la actualizamos
     public void addEntryToCache(String query, String answer) {
         if (cache.containsKey(query)) { // HIT
             // Bring to front
@@ -49,13 +51,15 @@ public class LRUCache {
             cache.put(query, answer);
         }
     }
-
+    
+    // Mostramos todas las llaves del cache
     public void print() {
         System.out.println("===== My LRU Cache =====");
         System.out.println("| " + String.join(" | ", cache.keySet()) + " | ");
         System.out.println("========================");
     }
-
+    
+    // Mostramos todas las values del cache
     public void printAns() {
         System.out.println("===== My LRU Cache Answers =====");
         System.out.println("| " + String.join(" | ", cache.values()) + " | ");
