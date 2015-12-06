@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tcpserver;
+package lab_1_sd;
 
 import java.io.*;
 import java.net.*;
@@ -12,7 +12,7 @@ import java.net.*;
  *
  * @author luis
  */
-public class ClientePUT {
+public class ClienteDELETE {
     
     public static void main(String args[]) throws Exception{
         //Variables
@@ -36,7 +36,7 @@ public class ClientePUT {
         String sentence = inFromUser.readLine();
         
         // estructura improvisada
-        sentence = "PUT /consulta/" + sentence;
+        sentence = "GET /consulta/" + sentence;
         String[] requests = {sentence};
         
         for (String request : requests) {

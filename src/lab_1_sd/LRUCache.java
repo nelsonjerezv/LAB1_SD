@@ -1,4 +1,4 @@
-package tcpserver;
+package lab_1_sd;
 
 import java.util.LinkedHashMap;
 

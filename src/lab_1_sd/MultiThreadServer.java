@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package tcpserver;
+package lab_1_sd;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
