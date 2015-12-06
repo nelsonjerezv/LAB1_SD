@@ -36,7 +36,7 @@ public class ClientePOST {
         String sentence = inFromUser.readLine();
         
         // estructura improvisada
-        sentence = "POST /consulta/" + sentence;
+        sentence = "POST /consulta/" + sentence; 
         String[] requests = {sentence};
         
         for (String request : requests) {
