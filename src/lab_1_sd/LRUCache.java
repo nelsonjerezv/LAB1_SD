@@ -2,10 +2,6 @@ package lab_1_sd;
 
 import java.util.LinkedHashMap;
 
-/**
- *
- * @author nelson
- */
 public class LRUCache {
 
     int size;
@@ -63,15 +59,10 @@ public class LRUCache {
     // Mostramos todas las llaves del cache
     public void print() {
         System.out.println("===== My LRU Cache =====");
-        System.out.println("| " + String.join(" | ", cache.keySet()) + " | ");
+        System.out.println("| " + String.join(" | "/*"\n"*/, cache.keySet()) + " | ");
+        System.out.println("===== My LRU Cache Answers =====");
+        System.out.println("| " + String.join(" | "/*"\n"*/, cache.values()) + " | ");
         System.out.println("========================");
     }
     
-    // Mostramos todas las values del cache
-    public void printAns() {
-        System.out.println("===== My LRU Cache Answers =====");
-        System.out.println("| " + String.join(" | ", cache.values()) + " | ");
-        System.out.println("========================");
-    }
-
 }

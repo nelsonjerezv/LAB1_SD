@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package lab_1_sd;
 
@@ -57,74 +52,124 @@ public class MultiThreadServer implements Runnable {
                 }
             }
 
-            System.out.println("Consulta: " + fromClient);
-            System.out.println("HTTP METHOD: " + http_method);
-            System.out.println("Resource: " + resource);
-            System.out.println("ID:          " + id);
-            System.out.println("META DATA:    " + meta_data);  
+            System.out.println("CONSULTA:       " + fromClient);
+            System.out.println("HTTP METHOD:    " + http_method);
+            System.out.println("Resource:       " + resource);
+            System.out.println("ID:             " + id);
+            System.out.println("META DATA:      " + meta_data);  
             
             // Determinamos la particion a acceder con una funcion hash
-            int ParticionDestino = hash(id, particiones.size());
-            System.out.println("pd:"+ParticionDestino);
+            int ParticionDestino = hash(id, particiones.size()-1);
+            System.out.println("Particion destino:"+ParticionDestino);
 
             switch (http_method) {
                 case "GET":
-                    if ("".equals(id)) {
-                        System.out.println("Buscando en la base de datos los ultimos 10 registros de tipo '" + resource + "'");
-                        // buscar en el cache nivel general para un resource                      
-                    } else {
-                        System.out.println("Buscando en el cache de '" + resource + "' el registro con id " + id);
-                        // buscar en el cache la respuesta a la query
-                        String result = particiones.get(ParticionDestino).getEntryFromCache(id);
-                        if (result == null) { // MISS
-                            System.out.println("MISS :(");
-                            //Enviamos miss al cliente
-                            outToClient.writeBytes("MISS\n");
-                            //particiones.get(ParticionDestino).addEntryToCache(id, id.toUpperCase());
-                        }else{
-                            System.out.println("HIT !");
-                            // Enviamos hit al cliente
-                            outToClient.writeBytes(result+"\n");
-                        }
+                    
+                    System.out.println("Buscando en el cache de '" + resource + "' el registro con id " + id);
+                    // buscar en el cache estatico la respuesta a la query
+                    String result = particiones.get(particiones.size()-1).getEntryFromCache(id);
+
+                    if(result != null){//Si está
+                        System.out.println("Entrada en el cache estático - Particion: "+(particiones.size()-1));
+                        // Mostramos el cache(querys y answers)
+                        particiones.get(particiones.size()-1).print(); System.out.println("");
+                    }else{ //Si no está en el caché estático, verifico a la particion correspondiente
+                        result = particiones.get(ParticionDestino).getEntryFromCache(id);
                         // Mostramos el cache(querys y answers)
                         particiones.get(ParticionDestino).print(); System.out.println("");
-                        particiones.get(ParticionDestino).printAns(); System.out.println("");
+                    }
+                    if (result == null) { // MISS
+                        System.out.println("MISS");
+                        //Enviamos miss al cliente
+                        outToClient.writeBytes("MISS");
+                    }else{
+                        System.out.println("HIT");
+                        // Enviamos hit al cliente
+                        outToClient.writeBytes(result);
                     }
                     break;
                 case "POST":
                     System.out.println("Mensaje desde IndexService");
                     System.out.println("Agregamos:\n    query : " + id + "\n    answer: " + id.toUpperCase());
                     
-                    // Metodo sincrono para agregar la query con su respuesta al cache
-                    syncPost(ParticionDestino, id);
+                    // buscar en el cache estatico la respuesta a la query
+                    result = particiones.get(particiones.size()-1).getEntryFromCache(id);
+                    if (result == null) {//si no está
+                        // Metodo sincrono para agregar la query con su respuesta al cache
+                        syncPost(ParticionDestino, id);  
+                        // Mostramos el cache(querys y answers)
+                        particiones.get(ParticionDestino).print();
+
+                    }else{//Si esta
+                        System.out.println("La entrada está en la parte estática del cache");
+                        // Mostramos el cache(querys y answers)
+                        particiones.get(particiones.size()-1).print();
+                    }
                     
-                    outToClient.writeBytes("Agregado.\n");
-                    // Mostramos el cache(querys y answers)
-                    particiones.get(ParticionDestino).print(); System.out.println("");
-                    particiones.get(ParticionDestino).printAns(); System.out.println("");
+                    outToClient.writeBytes("Agregado\n");                   
+
                     break;
                 case "PUT":                  
                     System.out.println("Mensaje desde IndexService");
                     System.out.println("Actualizamos:\n    query : " + id + "\n    answer: " + id.toLowerCase());
+                   
+                    //Se busca entrada en el cache estatico
+                    result = particiones.get(particiones.size()-1).getEntryFromCache(id);
                     
-                    // Metodo sincrono para actualizar la respuesta de la query
-                    syncPut(ParticionDestino, id);
+                    if (result == null) {//Si no está
+                        //Se busca si está en la particion correspondiente
+                        result = particiones.get(ParticionDestino).getEntryFromCache(id);
+                        if (result == null) {//si no está
+                            System.out.println("Entrada no existe");
+                            particiones.get(ParticionDestino).print();
+                            outToClient.writeBytes("No actualizado, entrada no existe.\n");
+                        }else{//Si está
+                            // Metodo sincrono para actualizar la respuesta de la query
+                            syncPut(ParticionDestino, id);
+                            // Mostramos el cache(querys y answers)
+                            particiones.get(ParticionDestino).print();
+                            outToClient.writeBytes("Actualizado.\n");
+                        }
+
+                    }else{
+                        System.out.println("La entrada está en la parte estática del cache");
+                        syncPut(particiones.size()-1, id);
+                        // Mostramos el cache(querys y answers)
+                        particiones.get(particiones.size()-1).print();
+                        outToClient.writeBytes("Actualizado.\n");
+                    }
                     
-                    outToClient.writeBytes("Actualizado.\n");
-                    // Mostramos el cache(querys y answers)
-                    particiones.get(ParticionDestino).print(); System.out.println("");
-                    particiones.get(ParticionDestino).printAns(); System.out.println("");
                     break;
                 case "DELETE":
                     System.out.println("Mensaje desde IndexService");
                     System.out.println("Borrando el recurso de tipo '" + resource + "' con id " + id);
                     
-                    syncDelete(ParticionDestino, id);
+                    //Se busca entrada en el cache estatico
+                    result = particiones.get(particiones.size()-1).getEntryFromCache(id);
                     
-                    outToClient.writeBytes("Eliminado.\n");
-                    // Mostramos el cache(querys y answers)
-                    particiones.get(ParticionDestino).print(); System.out.println("");
-                    particiones.get(ParticionDestino).printAns(); System.out.println("");
+                    if (result == null) {//Si no está
+                        //Se busca si está en la particion correspondiente
+                        result = particiones.get(ParticionDestino).getEntryFromCache(id);
+                        if (result == null) {//si no está
+                            System.out.println("Entrada no existe");
+                            particiones.get(ParticionDestino).print();
+                            outToClient.writeBytes("No eliminado, entrada no existe.\n");
+                        }
+                        else{//Si está
+                            // Metodo sincrono para eliminar la respuesta de la query
+                            syncDelete(ParticionDestino, id);
+                            // Mostramos el cache(querys y answers)
+                            particiones.get(ParticionDestino).print();
+                            outToClient.writeBytes("Eliminado.\n");
+                        }
+                    }else{
+                        System.out.println("La entrada está en la parte estática del cache");
+                        // Metodo sincrono para eliminar la respuesta de la query
+                        syncDelete(particiones.size()-1, id);
+                        // Mostramos el cache(querys y answers)
+                        particiones.get(particiones.size()-1).print();
+                        outToClient.writeBytes("Eliminado.\n");
+                    }
                     break;
                 default:
                     System.out.println("Not a valid HTTP Request");
@@ -159,6 +204,5 @@ public class MultiThreadServer implements Runnable {
     private void syncDelete(int ParticionDestino, String id) {
         particiones.get(ParticionDestino).removeEntryFromCache(id);
     }
-    
     
 }
