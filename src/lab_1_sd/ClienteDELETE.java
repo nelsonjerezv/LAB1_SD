@@ -36,7 +36,7 @@ public class ClienteDELETE {
         String sentence = inFromUser.readLine();
         
         // estructura improvisada
-        sentence = "GET /consulta/" + sentence;
+        sentence = "DELETE /consulta/" + sentence;
         String[] requests = {sentence};
         
         for (String request : requests) {
