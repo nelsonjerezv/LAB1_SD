@@ -1,3 +1,4 @@
+
 package lab_1_sd;
 
 import java.io.BufferedReader;
@@ -80,11 +81,11 @@ public class MultiThreadServer implements Runnable {
                     if (result == null) { // MISS
                         System.out.println("MISS");
                         //Enviamos miss al cliente
-                        outToClient.writeBytes("MISS");
+                        outToClient.writeBytes("MISS\n");
                     }else{
                         System.out.println("HIT");
                         // Enviamos hit al cliente
-                        outToClient.writeBytes(result);
+                        outToClient.writeBytes(result+"\n");
                     }
                     break;
                 case "POST":

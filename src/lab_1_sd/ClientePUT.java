@@ -1,3 +1,4 @@
+
 package lab_1_sd;
 
 import java.io.*;
@@ -9,7 +10,7 @@ public class ClientePUT {
     public static void main(String args[]) throws Exception{
         //Variables
         String fromServer;
-       
+        System.out.println("Actualizar: ");
         //Buffer para recibir desde consola
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();

@@ -1,4 +1,6 @@
+
 package lab_1_sd;
+
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

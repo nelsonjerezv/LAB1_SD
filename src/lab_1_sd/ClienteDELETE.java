@@ -1,3 +1,4 @@
+
 package lab_1_sd;
 
 import java.io.*;
@@ -10,6 +11,7 @@ public class ClienteDELETE {
         String fromServer;
       
         //Buffer para recibir desde consola
+        System.out.println("Eliminar: ");
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();
         
