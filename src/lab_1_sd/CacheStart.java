@@ -43,8 +43,8 @@ public class CacheStart {
                 Particiones.add(lru_cache);
                 bandera=bandera+1;
             }else{
-            LRUCache lru_cache = new LRUCache(TamanoParticion);
-            Particiones.add(lru_cache);
+                LRUCache lru_cache = new LRUCache(TamanoParticion);
+                Particiones.add(lru_cache);
             }
         }
         Particiones.add(parteEstatica);

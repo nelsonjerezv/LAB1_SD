@@ -98,12 +98,12 @@ public class MultiThreadServer implements Runnable {
                         // Metodo sincrono para agregar la query con su respuesta al cache
                         syncPost(ParticionDestino, id);  
                         // Mostramos el cache(querys y answers)
-                        particiones.get(ParticionDestino).print();
+                        particiones.get(ParticionDestino).print(); System.out.println("");
 
                     }else{//Si esta
                         System.out.println("La entrada está en la parte estática del cache");
                         // Mostramos el cache(querys y answers)
-                        particiones.get(particiones.size()-1).print();
+                        particiones.get(particiones.size()-1).print(); System.out.println("");
                     }
                     
                     outToClient.writeBytes("Agregado\n");                   
@@ -121,13 +121,13 @@ public class MultiThreadServer implements Runnable {
                         result = particiones.get(ParticionDestino).getEntryFromCache(id);
                         if (result == null) {//si no está
                             System.out.println("Entrada no existe");
-                            particiones.get(ParticionDestino).print();
+                            particiones.get(ParticionDestino).print(); System.out.println("");
                             outToClient.writeBytes("No actualizado, entrada no existe.\n");
                         }else{//Si está
                             // Metodo sincrono para actualizar la respuesta de la query
                             syncPut(ParticionDestino, id);
                             // Mostramos el cache(querys y answers)
-                            particiones.get(ParticionDestino).print();
+                            particiones.get(ParticionDestino).print(); System.out.println("");
                             outToClient.writeBytes("Actualizado.\n");
                         }
 
@@ -135,7 +135,7 @@ public class MultiThreadServer implements Runnable {
                         System.out.println("La entrada está en la parte estática del cache");
                         syncPut(particiones.size()-1, id);
                         // Mostramos el cache(querys y answers)
-                        particiones.get(particiones.size()-1).print();
+                        particiones.get(particiones.size()-1).print(); System.out.println("");
                         outToClient.writeBytes("Actualizado.\n");
                     }
                     
@@ -152,7 +152,7 @@ public class MultiThreadServer implements Runnable {
                         result = particiones.get(ParticionDestino).getEntryFromCache(id);
                         if (result == null) {//si no está
                             System.out.println("Entrada no existe");
-                            particiones.get(ParticionDestino).print();
+                            particiones.get(ParticionDestino).print(); System.out.println("");
                             outToClient.writeBytes("No eliminado, entrada no existe.\n");
                         }
                         else{//Si está
@@ -167,7 +167,7 @@ public class MultiThreadServer implements Runnable {
                         // Metodo sincrono para eliminar la respuesta de la query
                         syncDelete(particiones.size()-1, id);
                         // Mostramos el cache(querys y answers)
-                        particiones.get(particiones.size()-1).print();
+                        particiones.get(particiones.size()-1).print(); System.out.println("");
                         outToClient.writeBytes("Eliminado.\n");
                     }
                     break;
