@@ -10,7 +10,7 @@ public class ClientePUT {
     public static void main(String args[]) throws Exception{
         //Variables
         String fromServer;
-        System.out.println("Actualizar: ");
+        System.out.print("Actualizar: ");
         //Buffer para recibir desde consola
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();

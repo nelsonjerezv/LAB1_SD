@@ -11,7 +11,7 @@ public class ClienteGET {
         String fromServer;
        
         //Buffer para recibir desde consola
-        System.out.println("Consultar: ");
+        System.out.print("Consultar: ");
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();
         

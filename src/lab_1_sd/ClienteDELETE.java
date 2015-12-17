@@ -11,7 +11,7 @@ public class ClienteDELETE {
         String fromServer;
       
         //Buffer para recibir desde consola
-        System.out.println("Eliminar: ");
+        System.out.print("Eliminar: ");
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();
         

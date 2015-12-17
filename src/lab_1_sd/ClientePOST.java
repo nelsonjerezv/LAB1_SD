@@ -11,7 +11,7 @@ public class ClientePOST {
         //Variables
         String fromServer;
         
-        System.out.println("Agregar: ");
+        System.out.print("Agregar: ");
         //Buffer para recibir desde consola
         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
         String sentence = inFromUser.readLine();
